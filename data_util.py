@@ -19,7 +19,7 @@ class HDF5Reader():
     
     def get_batches(self, batch_size):
         dataset_fp = h5py.File(self.dataset_file, "r")
-        dsfp = dataset['data']
+        dsfp = dataset_fp['data']
         for i in xrange(len(dsfp) / batch_size):
             yield dsfp[i * batch_size: i * batch_size + batch_size]
         dataset_fp.close()

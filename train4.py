@@ -8,10 +8,11 @@ from model4 import *
 from util import *
 
 MSCOCO_TRAIN_PATH = '/share/MSCOCO/32x32/train2014/'
+SAVE_DURATION = 500
 
+BATCH_SIZE = 128
 n_epochs = 200
 learning_rate = 0.00005  # 0.00002
-batch_size = 128
 image_shape = [32, 32, 3]
 dim_z = 100
 dim_W1 = 512  # 1024
@@ -28,7 +29,7 @@ os.environ['CUDA_VISIBLE_DEVICES'] = '2'
 lsun_images = glob(MSCOCO_TRAIN_PATH + '*.jpg')
 
 dcgan_model = DCGAN(
-    batch_size=batch_size,
+    batch_size=BATCH_SIZE,
     image_shape=image_shape,
     dim_z=dim_z,
     dim_W1=dim_W1,
@@ -64,8 +65,8 @@ loss_list = []
 for epoch in range(n_epochs):
 
     for start, end in zip(
-            range(0, len(lsun_images), batch_size + 15),
-            range(batch_size + 15, len(lsun_images), batch_size + 15)
+            range(0, len(lsun_images), BATCH_SIZE + 15),
+            range(BATCH_SIZE + 15, len(lsun_images), BATCH_SIZE + 15)
     ):
 
         batch_image_files = lsun_images[start:end]
@@ -79,7 +80,7 @@ for epoch in range(n_epochs):
             if ddd.shape == (32, 32, 3):
                 batch_images.append(ddd)
         batch_images = np.array(batch_images).astype(np.float32)
-        batch_z = np.random.uniform(-1, 1, size=[batch_size, dim_z]).astype(np.float32)
+        batch_z = np.random.uniform(-1, 1, size=[BATCH_SIZE, dim_z]).astype(np.float32)
 
         p_real_val, p_gen_val, h_real_val, h_gen_val = sess.run([p_real, p_gen, h_real, h_gen], feed_dict={Z_tf: batch_z, image_tf: batch_images})
 
@@ -108,16 +109,16 @@ for epoch in range(n_epochs):
         p_gen_list.append(p_real_val.mean())
         p_val_list.append(p_gen_val.mean())
 
-        if np.mod(iterations, 500) == 0:
+        if np.mod(iterations, SAVE_DURATION) == 0:
             generated_samples = sess.run(
                 image_tf_sample,
                 feed_dict={
                     Z_tf_sample: Z_np_sample
                 })
             #####generated_samples = (generated_samples + 1.)/2.
-            save_visualization(generated_samples, (14, 14), save_path='./vis10_4/sample_' + str(iterations / 500) + '.jpg')
-        if np.mod(iterations, 500) == 0:
-            np.save("./vis10_4/array1_" + str(iterations / 500), np.array(p_gen_list))
-            np.save("./vis10_4/array2_" + str(iterations / 500), np.array(p_val_list))
-            np.save("./vis10_4/array3_" + str(iterations / 500), np.array(loss_list))
+            save_visualization(generated_samples, (14, 14), save_path='./vis10_4/sample_' + str(iterations / SAVE_DURATION) + '.jpg')
+        if np.mod(iterations, SAVE_DURATION) == 0:
+            np.save("./vis10_4/array1_" + str(iterations / SAVE_DURATION), np.array(p_gen_list))
+            np.save("./vis10_4/array2_" + str(iterations / SAVE_DURATION), np.array(p_val_list))
+            np.save("./vis10_4/array3_" + str(iterations / SAVE_DURATION), np.array(loss_list))
         iterations += 1

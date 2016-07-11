@@ -102,7 +102,8 @@ def train():
                 #####generated_samples = (generated_samples + 1.)/2.
                 save_visualization(generated_samples, (14, 14), save_path='./vis10_4/sample_' + str(it_num / SAVE_DURATION) + '.jpg')
 
-            if np.mod(it_num, SAVE_DURATION) == 0:
                 np.save("./vis10_4/array1_" + str(it_num / SAVE_DURATION), np.array(p_gen_list))
                 np.save("./vis10_4/array2_" + str(it_num / SAVE_DURATION), np.array(p_val_list))
                 np.save("./vis10_4/array3_" + str(it_num / SAVE_DURATION), np.array(loss_list))
+                
+        reader.close()
