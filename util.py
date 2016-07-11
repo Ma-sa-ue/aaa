@@ -5,7 +5,8 @@ from glob import glob
 from PIL import Image
 import numpy as np
 
-def crop_resize(image_path, resize_shape=(32,32,3)):
+
+def crop_resize(image_path, resize_shape=(32, 32, 3)):
     pilImg = Image.open(image_path)
     imgArray = np.asarray(pilImg)
     '''
@@ -25,7 +26,7 @@ def crop_resize(image_path, resize_shape=(32,32,3)):
 
     return resized_image/127.5 - 1
     '''
-    return imgArray/238.0
+    return imgArray / 238.0
 """
 def save_visualization(X, (nh, nw), save_path='./vis/sample.jpg'):
     h,w = X.shape[1], X.shape[2]
@@ -38,12 +39,14 @@ def save_visualization(X, (nh, nw), save_path='./vis/sample.jpg'):
 
     scipy.misc.imsave(save_path, img)
 """
+
+
 def save_visualization(X, (nh, nw), save_path='./vis2/sample.jpg'):
-    h,w = X.shape[1], X.shape[2]
+    h, w = X.shape[1], X.shape[2]
     img = np.zeros((h * nh, w * nw, 3))
 
-    for n,x in enumerate(X):
+    for n, x in enumerate(X):
         j = n / nw
         i = n % nw
-        img[j*h:j*h+h, i*w:i*w+w, :] = x
-    np.save(save_path,img)
+        img[j * h:j * h + h, i * w:i * w + w, :] = x
+    np.save(save_path, img)
