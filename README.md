@@ -3,9 +3,9 @@
 ### Requirements
 
 * TensorFlow
-* Pandas
-* Numpy
-* ipdb
+* Others: Pandas, Numpy, ipdb, invoke, etc.
+
+	$ pip install -r requirements.txt
 
 ### mount '/share/dataset' on Leto -> local '/share'
 
@@ -16,6 +16,15 @@ E.g.;
 ## How to use
 
 	python train4.py
+
+## How to use (invoke ver.)
+	
+	$ inv prepare
+	$ inv train
+
+for debugging;
+
+	$ ipython tasks.py
 
 ## Memos
 
@@ -39,3 +48,53 @@ E.g.;
 * Discriminatorの出力が2*sigmoid
 * learning rateは低め
 * 畳み込みが 4*4
+
+## Coding feedbacks
+
+* use autopep8 
+* Variable names:
+ - MSCOCO_TRAIN_PATH -> for const
+
+* use consts
+ - 500, 128 -> magic numbers
+
+* WTF!?
+
+```
+for start, end in zip(
+        range(0, len(lsun_images), batch_size + 15),
+        range(batch_size + 15, len(lsun_images), batch_size + 15)
+):
+``` 
+
+Probably TensorFlow / Scipy have convenient functions for batch split
+
+* separate the model part and training part more explicitly. Following lines can be moved DCBAN class?
+ 
+```
+Z_tf, image_tf, d_cost_tf, g_cost_tf, p_real, p_gen, h_real, h_gen = dcgan_model.build_model()
+sess = tf.InteractiveSession()
+saver = tf.train.Saver(max_to_keep=10)
+
+discrim_vars = filter(lambda x: x.name.startswith('discrim'), tf.trainable_variables())
+gen_vars = filter(lambda x: x.name.startswith('gen'), tf.trainable_variables())
+
+train_op_discrim = tf.train.AdamOptimizer(learning_rate, beta1=0.5).minimize(d_cost_tf, var_list=discrim_vars)
+train_op_gen = tf.train.AdamOptimizer(learning_rate, beta1=0.5).minimize(g_cost_tf, var_list=gen_vars)
+
+Z_tf_sample, image_tf_sample = dcgan_model.samples_generator(batch_size=visualize_dim)
+
+tf.initialize_all_variables().run()
+```
+
+* Data cropping and reshape should be done before the main task.
+
+```
+	batch_images = []
+	for i in batch_image_files:
+        if len(batch_images) == 128:
+            break
+        ddd = crop_resize(os.path.join(MSCOCO_TRAIN_PATH, i))
+        if ddd.shape == (32, 32, 3):
+            batch_images.append(ddd)
+```
