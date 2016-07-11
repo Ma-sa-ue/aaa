@@ -1,0 +1,6 @@
+pandas
+numpy
+ipdb
+invoke==0.12.2
+h5py
+tqdm
