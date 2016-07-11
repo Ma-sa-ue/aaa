@@ -5,9 +5,8 @@ from glob import glob
 from PIL import Image
 import numpy as np
 
-
 def crop_resize(image_path, resize_shape=(32, 32, 3)):
-    pilImg = Image.open(image_path)
+    pilImg = Image.open(image_path).convert('RGB')
     imgArray = np.asarray(pilImg)
     '''
     image = cv2.imread(image_path)
@@ -50,3 +49,8 @@ def save_visualization(X, (nh, nw), save_path='./vis2/sample.jpg'):
         i = n % nw
         img[j * h:j * h + h, i * w:i * w + w, :] = x
     np.save(save_path, img)
+
+def get_batches(data, batch_size):
+    for i in range(0, len(data), batch_size):
+        yield data[i: i + batch_size]
+        
